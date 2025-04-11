@@ -1,0 +1,16 @@
+@import "tailwindcss";
+body{
+    background-color:#111 ;
+    color: #fff;
+}
+input{
+    background-color: #fff;
+    color:#111;
+}
+h1{
+    
+    text-decoration: underline;
+    font-size: 70px;
+    font-weight: 600;
+    color: #fff;
+}
