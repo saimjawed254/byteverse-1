@@ -18,6 +18,7 @@ createRoot(document.getElementById('root')).render(
         <Route path='/user-home' element={<User/>}/>     
         <Route path='/user-home/health-form' element={<HealthForm/>}/>     
         <Route path='/user-home/medicine-reminder' element={<MedicineReminder/>}/>  
+        <Route path='/user-home/pose-detection' element={<PoseDetection/>}/>
         <Route path='/volunteer-home' element={<Volunte/>}/>     
         <Route path='/admin-home' element={<Admin/>}/>     
       </Routes>
