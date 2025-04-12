@@ -1,70 +1,117 @@
-import { useRef } from "react"
-import axios from "axios";
+import { useEffect, useRef, useState } from 'react'
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from "react-redux";
+import { toast, ToastContainer } from 'react-toastify'
+import { logActions } from '../../store/logSlice';
 
 function Login() {
-    const imageInputRef = useRef(null);
-    const govidInputRef = useRef(null);
-    const typeRef = useRef();
-    const nameRef = useRef();
-    const ageRef = useRef();
-    const genderRef = useRef();
-    const emailRef = useRef();
-    const numberRef = useRef();
-    const addressRef = useRef();
 
+    const logValue=useSelector((store)=>store.log)
+    const dispatch=useDispatch()
+    console.log(logValue.log)
 
-    const handleForm = async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-        formData.append("image", imageInputRef.current.files[0]);
-        formData.append("govid", govidInputRef.current.files[0]);
-        formData.append("type", typeRef.current.value);
-        formData.append("name", nameRef.current.value);
-        formData.append("age", ageRef.current.value);
-        formData.append("gender", genderRef.current.value);
-        formData.append("email", emailRef.current.value);
-        formData.append("number", numberRef.current.value);
-        formData.append("address", addressRef.current.value);
-
-        try {
-            const response = await axios.post('http://127.0.0.1:3000/login', formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-            console.log("Data Uploaded Successfully", response.data.message);
-        } catch (e) {
-            console.log("Data could not be uploaded", e);
-        }
-        imageInputRef.current.value = "";
-        govidInputRef.current.value = "";
-        typeRef.current.value = "";
-        nameRef.current.value = "";
-        ageRef.current.value = "";
-        genderRef.current.value = "";
-        emailRef.current.value = "";
-        numberRef.current.value = "";
-        addressRef.current.value = "";
+    function login() {
+        dispatch(logActions.logged())
+        console.log(logValue.log);
     }
 
+    const buttonInfoSignup = { link: "", text: "Send OTP" }
+    const buttonInfoOtp = { link: "", text: "Verify OTP" }
+    const emailRef = useRef()
+    let email,type;
+    const otpRef = useRef()
+    const typeRef = useRef()
+
+    const navigate = useNavigate()
+
+
+    const handleSignup = async (event) => {
+        event.preventDefault()
+
+        function visibilityChanger() {
+            const signUp = document.querySelector('.signup')
+            const otpVerify = document.querySelector('.otp-verify')
+            signUp.style.visibility = 'hidden'
+            otpVerify.style.visibility = 'visible'
+        } visibilityChanger()
+
+        email = emailRef.current.value;
+        type = typeRef.current.value;
+
+        try {
+            const { data } = await axios.post("http://localhost:3000/login/", {
+                email,
+                type,
+            })
+            console.log(data)
+            emailRef.current.value = "";
+            toast.success(data.message)
+        } catch (error) {
+            toast.error(error.response.data.message)
+        }
+    }
+
+    const handleotp = async (event) => {
+        event.preventDefault()
+
+        const otp = otpRef.current.value;
+        const type=typeRef.current.value;
+        console.log(otp)
+        try {
+            const { data } = await axios.post("http://localhost:3000/otp-verify/", {
+                otp,
+                receiver: email,
+                type,
+            }, {
+                withCredentials: true,
+            })
+            console.log(data)
+            otpRef.current.value = "";
+            toast.success(data.message)
+            login()
+            // navigate('/dashboard')
+        } catch (error) {
+            otpRef.current.value = "";
+            console.log(error)
+            toast.error(error.response.data.message)
+        }
+        typeRef.current.value=""
+        otpRef.current.value=""
+        emailRef.current.value=""
+    }
 
     return (
         <>
-            <h1>Login Page</h1>
-            <div className="image-form">
-                {/* enctype="multipart/form-data" */}
-                <form onSubmit={handleForm} action="">
-                    <input type="text" ref={typeRef} placeholder='Please enter your type!' required />
-                    <input type="text" ref={nameRef} placeholder='Please enter your good name!' required />
-                    <input type="number" ref={ageRef} placeholder='Please enter your age!' required />
-                    <input type="text" ref={genderRef} placeholder='Please enter your Gender!' required />
-                    <input type="text" ref={emailRef} placeholder='Please enter your Email!' required />
-                    <input type="text" ref={numberRef} placeholder='Please enter your Number!' required />
-                    <input type="text" ref={addressRef} placeholder='Please enter your Address!' required />
-                    <input type="file" name="image" ref={imageInputRef} />
-                    <input type="file" name="govid" ref={govidInputRef} />
-                    <input type="submit" value="Submit" />
+            <div className="login-bg">
+                <video className='video-dashboard' src="/Darken.mp4" type="video/mp4" autoPlay muted loop>
+                </video>
+            </div>
+
+            <div className="signup">
+                <div className="signup-heading">Sign Up</div>
+                <div className="signup-text"><br /> Enter your email address.</div>
+                <form action="" className="signup-form" onSubmit={handleSignup}>
+                    <input type="email" ref={emailRef} className="input-mobile" placeholder='Your email here.' required />
+                    <input type="text" ref={typeRef} className="input-mobile" placeholder='Your type here.' required />
+                    <button type='submit' className="button-signup">
+                        Submit
+                    </button>
                 </form>
             </div>
+
+            <div className="otp-verify">
+                <div className="otp-heading">OTP Sent!</div>
+                <div className="otp-text"> Enter the OTP sent to your email.</div>
+                <form action="" className="otp-form" onSubmit={handleotp}>
+                    <input type="number" ref={otpRef} className="input-otp" maxLength={6} required />
+                    <button type='submit' className="button-otp">
+                        {/* <ButtonSolid props={buttonInfoOtp} /> */}Submit
+                    </button>
+                </form>
+            </div>
+            {/* <ToastContainer theme="dark" position='top-right' /> */}
+
         </>
     )
 }
