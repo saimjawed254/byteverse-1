@@ -154,7 +154,7 @@ const HealthForm = () => {
             />
           </div>
           
-          <button type="submit" className="submit-btn">Sign In</button>
+          <button type="submit" className="submit-btn">Sign Up</button>
         </form>
       </div>
     </div>

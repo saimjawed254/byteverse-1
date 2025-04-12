@@ -9,6 +9,6 @@ import MedicineReminder from './pages/medicinereminder'
 import App from './App'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <User/>
+    <HealthForm/>
   </StrictMode>,
 )
